@@ -1,0 +1,11 @@
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+  filter: invert(1);
+}
+
+.map {
+    max-height: 50vh;
+    height: 50%;
+    width: 100%;
+    user-select: none;
+}

@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    image: popuku/domain-weakness-analysis-system:1.0.0
+    container_name: domain-weakness-analysis-system
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env

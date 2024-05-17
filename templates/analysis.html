@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Analysis Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+</head>
+
+<body>
+
+
+    <div class="container mb-5">
+        <div class="row mt-5 mb-5">
+            <h1 style="height: 10%;">{{ result.name }}</h1>
+
+        </div>
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link" href="#summary">Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#whois">Whois</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#hosts">Hosts</a>
+            </li>
+        </ul>
+
+        <div class="row justify-content-center" id="whois" hidden>
+            <div style="width: 70%">
+                <h3>Whois Data</h3>
+
+                <div class="overflow-auto" style="height: 50vh;">
+                    {% for key, value in result.whois_data.items() %}
+                    <p>{{ key | snake_case_to_normal }}: <br /> {{ value | safe }}</p>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+        <div class="row" id="hosts" hidden>
+            <div id="host-carousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        {% set first_host = result.hosts.items() | first %}
+                        <div class="row text-center">
+                            <h1>{{ first_host.0 }}</h1>
+                        </div>
+                        <div class="row m-auto overflow-auto" style="width: 70vw; max-height: 70vh">
+                            <div class="col-4 text-center">
+                                <h3>AS data</h3>
+                                {% for key, value in first_host.1.autonomous_system.items() %}
+                                <p>{{ key | snake_case_to_normal }}: <br /> {{ value | safe }}</p>
+                                {% endfor %}
+                            </div>
+                            <div class="col-4">
+                                <h3>Services</h3>
+                                {% for service in first_host.1.services %}
+                                <h5>Port: {{ service.port }}</h5>
+                                <h5>Protocol: {{ service.transport_protocol }}</h5>
+                                <h5>Softwares:</h5>
+                                {% for software in service.softwares %}
+                                <p class="text-break">
+                                    {{ software }}<br />
+                                </p>
+                                {% endfor %}
+                                <h5>Possible Vulnerabilities:</h5>
+
+                                {% for vulnerability in service.vulns %}
+                                <p>
+                                    {{ vulnerability.id }}: <br />
+                                    <span style="font-size: 10px;">{{vulnerability.description}}</span><br />
+                                    References: <a href="{{ vulnerability.url }}">{{ vulnerability.url }}</a><br />
+                                </p>
+                                {% endfor %}
+                                {% endfor %}
+                            </div>
+                            <div class="col-4">
+                                <h3>Location</h3>
+                                <div class="map" lat="{{ first_host.1.location.coordinates.latitude }}"
+                                    long="{{ first_host.1.location.coordinates.longitude }}"></div>
+                                <h5>Continent: {{ first_host.1.location.continent}}</h5>
+                                <h5>Country: {{ first_host.1.location.country}}</h5>
+                                <h5>City: {{ first_host.1.location.city}}</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% for ip, host in result.hosts.items() | except_first %}
+                    <div class="carousel-item">
+                        <div class="row text-center">
+                            <h1>{{ ip }}</h1>
+                        </div>
+                        <div class="row m-auto" style="width: 70vw;">
+                            <div class="col-4 overflow-auto text-center" style="max-height: 80vh">
+                                <h3>AS data</h3><br />
+                                {% for key, value in host.autonomous_system.items() %}
+                                <p>{{ key | snake_case_to_normal }}: <br /> {{ value | safe }}</p>
+                                {% endfor %}
+                            </div>
+                            <div class="col-4">
+                                <h3>Services</h3>
+                                {% for service in host.services %}
+                                <h5>Port: {{ service.port }}</h5>
+                                <h5>Softwares:</h5>
+                                {% for software in service.softwares %}
+                                <p class="text-break">
+                                    {{ software }}<br />
+                                </p>
+                                {% endfor %}
+                                <h5>Possible Vulnerabilities:</h5>
+
+                                {% for vulnerability in service.vulns %}
+                                <p>
+                                    {{ vulnerability.id }}: <br />
+                                    <span style="font-size: 10px;">{{vulnerability.description}}</span><br />
+                                    References: <a href="{{ vulnerability.url }}">{{ vulnerability.url }}</a><br />
+                                </p>
+                                {% endfor %}
+                                {% endfor %}
+                            </div>
+                            <div class="col-4">
+                                <h3>Location</h3>
+                                <div class="map" lat="{{ host.location.coordinates.latitude }}"
+                                    long="{{ host.location.coordinates.longitude }}"></div>
+                                <h5>Continent: {{ host.location.continent}}</h5>
+                                <h5>Country: {{ host.location.country}}</h5>
+                                <h5>City: {{ host.location.city}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#host-carousel"
+                    data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#host-carousel"
+                    data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" id="summary" hidden>
+            <div style="width: 70%">
+                <h3>Summary</h3>
+                <p>{{ summary | safe }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+
+</html>
