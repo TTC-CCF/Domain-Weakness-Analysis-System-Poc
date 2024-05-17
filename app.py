@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, make_response
 from gen_data import DomainWeaknessAnalysis
 import validators
 import markdown
@@ -9,13 +9,18 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    error = request.cookies.get('error', None)
+    response = make_response(render_template('index.html', error=error))
+    response.set_cookie('error', '', expires=0)
+    return response
 
 @app.route('/analysis', methods=['GET'])
 def analysis():
     domain_name = request.args.get('name')
     if not validators.domain(domain_name):
-        return render_template('index.html', error='Invalid domain name')
+        response = redirect('/')
+        response.set_cookie('error', 'Invalid domain name', httponly=True, samesite='Strict')
+        return response
     
     result = DomainWeaknessAnalysis(domain_name)
     

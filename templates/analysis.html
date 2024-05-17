@@ -95,8 +95,8 @@
                         <div class="row text-center">
                             <h1>{{ ip }}</h1>
                         </div>
-                        <div class="row m-auto" style="width: 70vw;">
-                            <div class="col-4 overflow-auto text-center" style="max-height: 80vh">
+                        <div class="row m-auto overflow-auto" style="width: 70vw; max-height: 70vh">
+                            <div class="col-4 text-center">
                                 <h3>AS data</h3><br />
                                 {% for key, value in host.autonomous_system.items() %}
                                 <p>{{ key | snake_case_to_normal }}: <br /> {{ value | safe }}</p>
@@ -151,8 +151,7 @@
 
         <div class="row justify-content-center" id="summary" hidden>
             <div style="width: 70%">
-                <h3>Summary</h3>
-                <p>{{ summary | safe }}</p>
+                {{ summary | safe }}
             </div>
         </div>
 
