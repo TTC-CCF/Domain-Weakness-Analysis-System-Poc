@@ -18,9 +18,10 @@ I took research on the 3rd party tools that can be used for passive scanning of 
 
 I also utilized the Generative AI model - [Gemini](https://ai.google.dev/?gad_source=1&gclid=Cj0KCQjwgJyyBhCGARIsAK8LVLMiK2p9kOUo0AwatA-Xvficr9kW1RqwAfI8ke_XNFb0DCm2UEimX2saAsa2EALw_wcB) to summarize the parsed information and security risks or weaknesses.
 
+This system is a web application developed using Flask.
 The process of this system is as follows:
 1. Accept the domain name or IP address from the user.
-2. Use `pydig` to get the host binding with the domain.
+2. Use `pydig` to get the hosts binding with the domain.
 3. Use `python-whois` to get the whois information of the domain.
 4. Use Censys python sdk to get the information of the hosts.
 5. Iterate each hosts, cross reference the information with the NIST NVD api to get the possible vulnerabilities.
@@ -39,4 +40,4 @@ cp .env.example .env
 ```bash
 docker compose up -d
 ```
-3. The service will run on localhost:5000
+3. The system will run on localhost:5000
