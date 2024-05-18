@@ -10,6 +10,7 @@ import requests
 import pydig
 import whois
 import google.generativeai as genai
+import validators
 
 class NVDApi:
     base_url = 'https://services.nvd.nist.gov/rest/json/'
@@ -73,9 +74,13 @@ class NVDApi:
 class DomainWeaknessAnalysis:
     def __init__(self, domain: str):
         genai.configure(api_key=os.environ['GENMINI_API_KEY'])
-
+        
+        if validators.domain(domain):
+            self.ips = pydig.query(domain, 'A')
+        elif validators.ipv4(domain) or validators.ipv6(domain):
+            self.ips = [domain]
+            
         self.domain = domain
-        self.ips = pydig.query(domain, 'A')
         self.c = CensysCerts()
         self.h = CensysHosts()
         self.nvd_api = NVDApi()

@@ -4,7 +4,7 @@ Scanning for Domain Weaknesses In this exercise, our goal is to passively identi
 Please develop a system that conducts a passive scan of the domain to gather general information such as ASN, Abuse Contact, open ports, and certificates. Subsequently, analyze the collected data to summarize any security risks associated with the domain. 
 Please note that only passive scanning methods are permitted, which means using third-party data or accessing information legally without sending exploits or probes. 
 
-Input: Provide a domain or IP address 
+Input: Provide a domain or IP address  
 Output: 
 1. General information obtained 
 2. Identified security risks or weaknesses

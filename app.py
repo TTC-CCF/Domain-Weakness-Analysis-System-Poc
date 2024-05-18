@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, make_response
 from gen_data import DomainWeaknessAnalysis
+import re
 import validators
 import markdown
 import argparse
@@ -16,13 +17,16 @@ def index():
 
 @app.route('/analysis', methods=['GET'])
 def analysis():
-    domain_name = request.args.get('name')
-    if not validators.domain(domain_name):
+    user_input = request.args.get('name')
+    if not validators.domain(user_input) and \
+        not validators.ipv4(user_input) and \
+        not validators.ipv6(user_input):
+            
         response = redirect('/')
         response.set_cookie('error', 'Invalid domain name', httponly=True, samesite='Strict')
         return response
     
-    result = DomainWeaknessAnalysis(domain_name)
+    result = DomainWeaknessAnalysis(user_input)
     
     if args.debug:
         with open('debug.json', 'r') as f:
