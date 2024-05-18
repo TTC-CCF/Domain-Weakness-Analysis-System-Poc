@@ -77,17 +77,19 @@ class DomainWeaknessAnalysis:
         
         if validators.domain(domain):
             self.ips = pydig.query(domain, 'A')
+            self.domain = domain
         elif validators.ipv4(domain) or validators.ipv6(domain):
             self.ips = [domain]
+            self.domain = None
             
-        self.domain = domain
         self.c = CensysCerts()
         self.h = CensysHosts()
         self.nvd_api = NVDApi()
         self.model = genai.GenerativeModel(model_name='gemini-1.0-pro')
 
-    def remove_outdated_certs(self, certs):
+    def remove_outdated_certs(self, certs) -> list:
         valid_certs = []
+                
         for cert in certs:
             start = cert["parsed"]["validity_period"]["not_before"]
             end = cert["parsed"]["validity_period"]["not_after"]
@@ -100,7 +102,10 @@ class DomainWeaknessAnalysis:
 
         return valid_certs
 
-    def get_whois(self):
+    def get_whois(self) -> dict:
+        if not self.domain:
+            return dict()
+        
         data = whois.whois(self.domain)
 
         idx = 0
@@ -123,6 +128,9 @@ class DomainWeaknessAnalysis:
         return data
 
     def get_certs_by_name(self):
+        if not self.domain:
+            return []
+        
         return self.c.search("names: {}".format(self.domain))()
 
     def get_hosts_data(self):
@@ -195,7 +203,7 @@ class DomainWeaknessAnalysis:
         hosts = self.get_hosts_data()
         
         result = {
-            "name": self.domain,
+            "name": self.domain if self.domain else self.ips[0],
             "whois_data": whois_data,
             "hosts": hosts,
             "valid certs": certs,
