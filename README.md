@@ -41,3 +41,9 @@ cp .env.example .env
 docker compose up -d
 ```
 3. The system will run on localhost:5000
+
+## Screenshots
+![homepage](assets/homepage.png)
+![summary](assets/summary.png)
+![whois](assets/whois.png)
+![host](assets/host.png)
